@@ -1,7 +1,9 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from .models import Curso
+from .forms import CursoForm
 
 # Create your views here.
 
@@ -55,10 +57,43 @@ def login_view(request):
         if user is not None:
             # Se o usuário for autenticado, faz o login e redireciona
             login(request, user)
-            return redirect('inicio')  # Redireciona para a URL 'inicio' após o login
+            return redirect('listar_cursos')  # Redireciona para a URL 'inicio' após o login
         else:
             # Caso as credenciais sejam inválidas, exibe uma mensagem de erro
             messages.error(request, 'Usuário ou senha inválidos!')
             return redirect('login')  # Redireciona de volta para a página de login
 
     return render(request, 'login.html')  # Exibe o formulário de login
+
+def adicionar_curso(request):
+    if request.method == 'POST':
+        form = CursoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_cursos')  # Redireciona para a página que lista os cursos
+    else:
+        form = CursoForm()
+    return render(request, 'adicionar_curso.html', {'form': form})
+
+# Página que lista os cursos cadastrados
+def listar_cursos(request):
+    cursos = Curso.objects.all()
+    return render(request, 'listar_cursos.html', {'cursos': cursos})
+
+# Editar curso
+def editar_curso(request, id):
+    curso = get_object_or_404(Curso, id=id)
+    if request.method == 'POST':
+        form = CursoForm(request.POST, instance=curso)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_cursos')
+    else:
+        form = CursoForm(instance=curso)
+    return render(request, 'editar_curso.html', {'form': form})
+
+# Deletar curso
+def deletar_curso(request, id):
+    curso = get_object_or_404(Curso, id=id)
+    curso.delete()
+    return redirect('listar_cursos')
