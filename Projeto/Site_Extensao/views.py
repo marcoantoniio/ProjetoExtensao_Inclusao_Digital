@@ -7,9 +7,6 @@ from .forms import CursoForm
 
 # Create your views here.
 
-def inicio(request):
-    return render(request, "inicio.html")
-
 # Função para lidar com o processo de cadastro de um novo usuário
 def cadastro(request):
     # Verifica se a requisição foi feita via método POST
@@ -67,17 +64,18 @@ def login_view(request):
 
 def adicionar_curso(request):
     if request.method == 'POST':
-        form = CursoForm(request.POST)
+        form = CursoForm(request.POST, request=request)  # Passando o request para o formulário
         if form.is_valid():
-            form.save()
-            return redirect('listar_cursos')  # Redireciona para a página que lista os cursos
+            form.save()  # Agora o formulário irá associar o usuário logado ao curso
+            return redirect('listar_cursos')  # Redireciona para a lista de cursos
     else:
-        form = CursoForm()
+        form = CursoForm(request=request)  # Passando o request no GET também
+
     return render(request, 'adicionar_curso.html', {'form': form})
 
 # Página que lista os cursos cadastrados
 def listar_cursos(request):
-    cursos = Curso.objects.all()
+    cursos = Curso.objects.filter(user=request.user)  # Filtra apenas os cursos do usuário logado
     return render(request, 'listar_cursos.html', {'cursos': cursos})
 
 # Editar curso

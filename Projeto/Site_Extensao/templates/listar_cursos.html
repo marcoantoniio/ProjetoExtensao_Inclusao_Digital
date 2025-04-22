@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursos Cadastrados</title>
+    <title>Cursos/Disciplinas Cadastrados</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -108,10 +108,20 @@
         .logout-link a:hover {
             background-color: #c9302c;
         }
+
+        .anotacoes-texto {
+            color: #444;
+            font-size: 13px;
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
-    <h1>Cursos Cadastrados</h1>
+    <h1>Cursos/Disciplinas Cadastrados</h1>
 
     <div class="cursos-lista">
         {% for curso in cursos %}
@@ -120,6 +130,14 @@
                 <p>Carga horária: {{ curso.carga_horaria }} horas</p>
                 <p>Início: {{ curso.data_inicio|date:"d/m/Y" }}</p>
                 <p>Fim: {{ curso.data_fim|date:"d/m/Y" }}</p>
+
+                {% if curso.anotacoes %}
+                    <div class="anotacoes-texto">
+                        <strong>Anotações:</strong><br>
+                        {{ curso.anotacoes|linebreaksbr }}
+                    </div>
+                {% endif %}
+
                 <a href="{% url 'editar_curso' curso.id %}">Editar</a>
                 <a href="{% url 'deletar_curso' curso.id %}" onclick="return confirm('Tem certeza que deseja excluir este curso?')">Excluir</a>
             </div>
@@ -130,7 +148,7 @@
 
     <div class="add-course-link">
         <a href="{% url 'adicionar_curso' %}" class="botao-adicionar">
-            + Adicionar Novo Curso
+            + Adicionar Novo Curso/Disciplina
         </a>
     </div>
     <div class="logout-link">
